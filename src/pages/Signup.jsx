@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSignup = async () => {
-    if (!email || !password) return alert("Fill all fields");
+    if (!email || !password) {
+      alert("Fill all fields");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -19,6 +25,8 @@ function Signup() {
     } catch (err) {
       alert(err.message);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -47,18 +55,21 @@ function Signup() {
           className="w-full mb-4 p-2 rounded bg-black/30 border border-green-700/30 outline-none text-white"
         />
 
+        {/* BUTTON WITH LOADING */}
         <button
           onClick={handleSignup}
-          className="w-full bg-green-500 text-black py-2 rounded-lg font-semibold hover:bg-green-400"
+          disabled={loading}
+          className="w-full bg-green-500 text-black py-2 rounded-lg font-semibold hover:bg-green-400 disabled:opacity-50"
         >
-          Create Account
+          {loading ? "Creating account..." : "Create Account"}
         </button>
+
         <p className="text-gray-400 text-sm text-center mt-4">
-  Already have an account?{" "}
-  <Link to="/login" className="text-green-400 hover:underline">
-    Login
-  </Link>
-</p>
+          Already have an account?{" "}
+          <Link to="/login" className="text-green-400 hover:underline">
+            Login
+          </Link>
+        </p>
 
       </motion.div>
     </div>

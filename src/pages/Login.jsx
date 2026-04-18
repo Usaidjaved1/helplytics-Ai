@@ -1,21 +1,28 @@
 import { useState } from "react";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if (!email || !password) return;
+
+    setLoading(true);
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
     } catch (err) {
       alert(err.message);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -44,22 +51,25 @@ function Login() {
           className="w-full mb-4 p-2 rounded bg-black/30 border border-green-700/30 outline-none text-white"
         />
 
+        {/* BUTTON WITH LOADING */}
         <button
           onClick={handleLogin}
-          className="w-full bg-green-500 text-black py-2 rounded-lg font-semibold hover:bg-green-400"
+          disabled={loading}
+          className="w-full bg-green-500 text-black py-2 rounded-lg font-semibold hover:bg-green-400 disabled:opacity-50"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
-<p className="text-gray-400 text-sm text-center mt-4">
-  Don’t have an account?{" "}
-  <Link to="/signup" className="text-green-400 hover:underline">
-    Sign up
-  </Link>
-</p>
+
+        <p className="text-gray-400 text-sm text-center mt-4">
+          Don’t have an account?{" "}
+          <Link to="/signup" className="text-green-400 hover:underline">
+            Sign up
+          </Link>
+        </p>
+
       </motion.div>
     </div>
   );
 }
-import { Link } from "react-router-dom";
 
 export default Login;
